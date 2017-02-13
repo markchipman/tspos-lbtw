@@ -10,7 +10,7 @@ var (
 	// Session Database session
 	Session *mgo.Session
 	// Mongo Connection options
-	Mongo   *mgo.DialInfo
+	Mongo *mgo.DialInfo
 )
 
 const (
