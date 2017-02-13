@@ -14,6 +14,7 @@ import (
 	"os"
 )
 
+// Config Configuration information
 type Config struct {
 	Listener struct {
 		Bind string `yaml:"bind"`

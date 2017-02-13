@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// Bind Read config file and load it into config structure
 func Bind(path string, config interface{}) error {
 
 	if _, err := os.Stat(path); err != nil {

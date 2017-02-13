@@ -7,12 +7,15 @@ import (
 )
 
 var (
-	Session *mgo.Session  // Database session
-	Mongo   *mgo.DialInfo // Connection options
+	// Session Database session
+	Session *mgo.Session
+	// Mongo Connection options
+	Mongo   *mgo.DialInfo
 )
 
 const (
-	MongoDBUrl = "mongodb://localhost:27017/tspos_lbtw" // MongoDB URL
+	// MongoDBUrl URL to MongoDB
+	MongoDBUrl = "mongodb://localhost:27017/tspos_lbtw"
 )
 
 // Connect connects to mongodb
