@@ -19,7 +19,7 @@ func Connect(c *gin.Context) {
 	c.Next()
 }
 
-// Error handler for gin
+// ErrorHandler Error handler for gin
 func ErrorHandler(c *gin.Context) {
 	c.Next()
 	if len(c.Errors) > 0 {
