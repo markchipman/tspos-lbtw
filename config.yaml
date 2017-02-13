@@ -1,0 +1,5 @@
+listener:
+  bind: localhost
+  port: 2727
+database:
+  url: mongodb://localhost:27017/tspos_lbtw
