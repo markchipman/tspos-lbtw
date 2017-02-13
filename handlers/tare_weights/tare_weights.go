@@ -1,12 +1,12 @@
 package tare_weights
 
 import (
-	"net/http"
 	"github.com/wormling/tspos-lbtw/models"
+	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"net/http"
 	"time"
-	"gopkg.in/gin-gonic/gin.v1"
 )
 
 func Create(c *gin.Context) {

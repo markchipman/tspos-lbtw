@@ -2,13 +2,13 @@ package db
 
 import (
 	"fmt"
-	"os"
 	"gopkg.in/mgo.v2"
+	"os"
 )
 
 var (
 	Session *mgo.Session
-	Mongo *mgo.DialInfo
+	Mongo   *mgo.DialInfo
 )
 
 const (

@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/wormling/tspos-lbtw/db"
-	"github.com/wormling/tspos-lbtw/middlewares"
-	"gopkg.in/gin-gonic/gin.v1"
-	"net/http"
-	"os"
-	"github.com/wormling/tspos-lbtw/handlers/tare_weights"
 	"flag"
 	"fmt"
-	"log"
+	"github.com/wormling/tspos-lbtw/db"
+	"github.com/wormling/tspos-lbtw/handlers/tare_weights"
+	"github.com/wormling/tspos-lbtw/middlewares"
+	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
 )
 
 type Config struct {

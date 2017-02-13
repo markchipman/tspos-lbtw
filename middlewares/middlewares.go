@@ -3,8 +3,8 @@
 package middlewares
 
 import (
-	"gopkg.in/gin-gonic/gin.v1"
 	"github.com/wormling/tspos-lbtw/db"
+	"gopkg.in/gin-gonic/gin.v1"
 	"net/http"
 )
 
