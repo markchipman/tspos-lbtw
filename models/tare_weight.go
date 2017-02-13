@@ -3,7 +3,7 @@ package models
 import "gopkg.in/mgo.v2/bson"
 
 const (
-	// Collection name
+	// CollectionTareWeights Collection name
 	CollectionTareWeights = "tare_weight"
 )
 
