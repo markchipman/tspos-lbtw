@@ -3,10 +3,11 @@ package models
 import "gopkg.in/mgo.v2/bson"
 
 const (
-	CollectionTareWeights = "tare_weight" // Collection name
+	// Collection name
+	CollectionTareWeights = "tare_weight"
 )
 
-// Model for liquor bottle tare weights
+// TareWeight Model for liquor bottle tare weights
 type TareWeight struct {
 	Id          bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty"`
 	Brand       string        `json:"brand" form:"brand" binding:"required" bson:"brand"`
