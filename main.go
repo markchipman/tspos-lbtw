@@ -64,6 +64,7 @@ func main() {
 
 	router.Use(middlewares.Connect)
 	router.Use(middlewares.ErrorHandler)
+	router.Use(middlewares.CORS)
 
 	router.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/v1/tare/weights")
@@ -97,6 +98,10 @@ func ensureIndex() {
 		DropDups:   true,
 		Background: true,
 		Sparse:     true,
+		Collation: &mgo.Collation{
+			Locale:   "en",
+			Strength: 2,
+		},
 	}
 	err := c.EnsureIndex(index)
 	if err != nil {
