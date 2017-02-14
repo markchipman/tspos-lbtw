@@ -7,6 +7,7 @@ import (
 	"github.com/wormling/tspos-lbtw/handlers/tare_weights"
 	"github.com/wormling/tspos-lbtw/middlewares"
 	"gopkg.in/gin-gonic/gin.v1"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -42,12 +43,6 @@ func main() {
 
 	flag.Parse()
 
-	// pull desired command/operation from args
-	//if flag.NArg() == 0 {
-	//	flag.Usage()
-	//	log.Fatal("Command argument required")
-	//}
-
 	config := Config{}
 	if _, err := os.Stat(cfgPath); err != nil {
 		log.Fatal("config path not valid")
@@ -82,7 +77,29 @@ func main() {
 		v1.DELETE("/weights/:_id", tare_weights.Delete)
 	}
 
+	ensureIndex()
+
+	// Start Server
 	bind := config.Listener.Bind
 	port := config.Listener.Port
 	router.Run(bind + ":" + port)
+}
+
+func ensureIndex() {
+	session := db.Session.Clone()
+	defer session.Close()
+
+	c := session.DB("tspos_lbtw").C("tare_weights")
+
+	index := mgo.Index{
+		Key:        []string{"brand", "category", "name", "bottle_size"},
+		Unique:     true,
+		DropDups:   true,
+		Background: true,
+		Sparse:     true,
+	}
+	err := c.EnsureIndex(index)
+	if err != nil {
+		panic(err)
+	}
 }
