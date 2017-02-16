@@ -4,7 +4,7 @@ import "gopkg.in/mgo.v2/bson"
 
 const (
 	// CollectionTareWeights Collection name
-	CollectionTareWeights = "tare_weight"
+	CollectionTareWeights = "tare_weights"
 )
 
 // TareWeight Model for liquor bottle tare weights
