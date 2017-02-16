@@ -78,7 +78,7 @@ func main() {
 		v1.DELETE("/weights/:_id", tare_weights.Delete)
 	}
 
-	ensureIndex()
+	go ensureIndex()
 
 	// Start Server
 	bind := config.Listener.Bind
