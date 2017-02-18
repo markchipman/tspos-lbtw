@@ -1,62 +1,24 @@
 package main
 
 import (
-	"flag"
-	"fmt"
+	"net/http"
+
+	"gopkg.in/gin-gonic/gin.v1"
+	"gopkg.in/mgo.v2"
+
+	"github.com/wormling/tspos-lbtw/config"
 	"github.com/wormling/tspos-lbtw/db"
 	"github.com/wormling/tspos-lbtw/handlers/tare_weights"
 	"github.com/wormling/tspos-lbtw/middlewares"
-	"gopkg.in/gin-gonic/gin.v1"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"os"
 )
-
-// Config Configuration information
-type Config struct {
-	Listener struct {
-		Bind string `yaml:"bind"`
-		Port string `yaml:"port"`
-	}
-	Database struct {
-		Url string `yaml:"url"`
-	}
-}
 
 func init() {
 	db.Connect()
 }
 
 func main() {
-	// Get Arguments
-	var cfgPath string
-
-	flag.StringVar(&cfgPath, "config", "./config.yaml", "Path to Config File")
-
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: %s [arguments] <command> \n", os.Args[0])
-		flag.PrintDefaults()
-	}
-
-	flag.Parse()
-
-	config := Config{}
-	if _, err := os.Stat(cfgPath); err != nil {
-		log.Fatal("config path not valid")
-	}
-
-	ymlData, err := ioutil.ReadFile(cfgPath)
-	if err != nil {
-		panic(err)
-	}
-
-	err = yaml.Unmarshal([]byte(ymlData), &config)
-	if err != nil {
-		panic(err)
-	}
+	config.BuildDefaultConf()
+	c, _ := config.LoadConfYaml("./config.yaml")
 
 	router := gin.Default()
 	router.RedirectTrailingSlash = true
@@ -81,8 +43,8 @@ func main() {
 	go ensureIndex()
 
 	// Start Server
-	bind := config.Listener.Bind
-	port := config.Listener.Port
+	bind := c.Core.Listener.Bind
+	port := c.Core.Listener.Port
 	router.Run(bind + ":" + port)
 }
 

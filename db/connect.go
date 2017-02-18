@@ -2,8 +2,8 @@ package db
 
 import (
 	"fmt"
+	"github.com/wormling/tspos-lbtw/config"
 	"gopkg.in/mgo.v2"
-	"os"
 )
 
 var (
@@ -13,17 +13,11 @@ var (
 	Mongo *mgo.DialInfo
 )
 
-const (
-	// MongoDBUrl URL to MongoDB
-	MongoDBUrl = "mongodb://localhost:27017/tspos_lbtw"
-)
-
 // Connect connects to mongodb
 func Connect() {
-	uri := os.Getenv("MONGODB_URL")
-	if len(uri) == 0 {
-		uri = MongoDBUrl
-	}
+	config.BuildDefaultConf()
+	c, _ := config.LoadConfYaml("./config.yaml")
+	uri := c.Core.Database.Url
 
 	mongo, err := mgo.ParseURL(uri)
 	s, err := mgo.Dial(uri)
