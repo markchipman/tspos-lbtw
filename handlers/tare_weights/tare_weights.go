@@ -119,34 +119,34 @@ func Delete(c *gin.Context) {
 	}
 }
 
-func MakeLink(c *gin.Context, page int, per_page int, rel_name string) string {
+func MakeLink(c *gin.Context, page int, perPage int, rel_name string) string {
 	lurl := location.Get(c)
 	query := c.Request.URL.Query()
 	query.Set("page", string(page))
-	query.Set("per_page", string(per_page))
+	query.Set("per_page", string(perPage))
 	link := c.Request
 	link.URL.RawQuery = query.Encode()
 
 	return fmt.Sprintf("<%s>; rel=\"%s\" ", lurl.Scheme+"://"+lurl.Host+link.RequestURI, rel_name)
 }
 
-func MakeLinkHeader(c *gin.Context, page int, per_page int, count int) string {
+func MakeLinkHeader(c *gin.Context, page int, perPage int, count int) string {
 	s := ""
 
 	// Build first link
-	s += MakeLink(c, 0, per_page, "first")
+	s += MakeLink(c, 0, perPage, "first")
 
 	// Build last link
-	s += MakeLink(c, count/per_page, per_page, "last")
+	s += MakeLink(c, count/perPage, perPage, "last")
 
 	if page >= 1 {
 		// Build prev link
-		s += MakeLink(c, page-1, per_page, "prev")
+		s += MakeLink(c, page-1, perPage, "prev")
 	}
 
 	if page <= count {
 		// Build next link
-		s += MakeLink(c, page+1, per_page, "next")
+		s += MakeLink(c, page+1, perPage, "next")
 	}
 
 	return s
