@@ -120,14 +120,14 @@ func Delete(c *gin.Context) {
 }
 
 func MakeLink(c *gin.Context, page int, per_page int, rel_name string) string {
-	url := location.Get(c)
+	lurl := location.Get(c)
 	query := c.Request.URL.Query()
 	query.Set("page", string(page))
 	query.Set("per_page", string(per_page))
 	link := c.Request
 	link.URL.RawQuery = query.Encode()
 
-	return fmt.Sprintf("<%s>; rel=\"%s\" ", url.Scheme+"://"+url.Host+link.RequestURI, rel_name)
+	return fmt.Sprintf("<%s>; rel=\"%s\" ", lurl.Scheme+"://"+lurl.Host+link.RequestURI, rel_name)
 }
 
 func MakeLinkHeader(c *gin.Context, page int, per_page int, count int) string {
