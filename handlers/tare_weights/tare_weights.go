@@ -80,6 +80,7 @@ func List(c *gin.Context) {
 	// rfc5988
 	links := MakeLinkHeader(c, page, per_page, count)
 	c.Header("Link", links)
+	c.Header("X-Total-Count", string(count))
 
 	c.JSON(http.StatusOK, gin.H{
 		"tareWeights": tareWeights,
