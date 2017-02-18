@@ -3,6 +3,7 @@ package tare_weights
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -13,7 +14,6 @@ import (
 
 	"github.com/gin-contrib/location"
 	"github.com/wormling/tspos-lbtw/models"
-	"net/url"
 )
 
 func Create(c *gin.Context) {
