@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/gin-contrib/location"
 	"gopkg.in/gin-contrib/cors.v1"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
@@ -25,6 +26,10 @@ func main() {
 	router.RedirectTrailingSlash = true
 	router.RedirectFixedPath = true
 
+	// configure to automatically detect scheme and host
+	// - use http when default scheme cannot be determined
+	// - use localhost:8080 when default host cannot be determined
+	router.Use(location.Default())
 	router.Use(middlewares.Connect)
 	router.Use(middlewares.ErrorHandler)
 	router.Use(cors.Default())

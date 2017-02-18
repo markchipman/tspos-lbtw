@@ -3,7 +3,6 @@ package tare_weights
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -12,7 +11,9 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
+	"github.com/gin-contrib/location"
 	"github.com/wormling/tspos-lbtw/models"
+	"net/url"
 )
 
 func Create(c *gin.Context) {
@@ -43,6 +44,7 @@ func Get(c *gin.Context) {
 }
 
 func List(c *gin.Context) {
+	lurl := location.Get(c)
 	db := c.MustGet("db").(*mgo.Database)
 	tareWeights := []models.TareWeight{}
 	//query := models.TareWeight{}
@@ -81,6 +83,7 @@ func List(c *gin.Context) {
 	firstQuery.Set("per_page", string(per_page))
 	first := c.Request
 	first.URL.RawQuery = firstQuery.Encode()
+	firstURL := lurl.Scheme + "://" + lurl.Host + first.RequestURI
 
 	// Build last link
 	lastQuery := c.Request.URL.Query()
@@ -88,6 +91,7 @@ func List(c *gin.Context) {
 	lastQuery.Set("per_page", string(per_page))
 	last := c.Request
 	last.URL.RawQuery = lastQuery.Encode()
+	lastURL := lurl.Scheme + "://" + lurl.Host + last.RequestURI
 
 	// Build prev link
 	prevQuery := c.Request.URL.Query()
@@ -95,6 +99,7 @@ func List(c *gin.Context) {
 	prevQuery.Set("per_page", string(per_page))
 	prev := c.Request
 	prev.URL.RawQuery = prevQuery.Encode()
+	prevURL := lurl.Scheme + "://" + lurl.Host + prev.RequestURI
 
 	// Build next link
 	nextQuery := c.Request.URL.Query()
@@ -102,13 +107,15 @@ func List(c *gin.Context) {
 	nextQuery.Set("per_page", string(per_page))
 	next := c.Request
 	next.URL.RawQuery = nextQuery.Encode()
+	nextURL := lurl.Scheme + "://" + lurl.Host + next.RequestURI
 
 	// rfc5988
-	links := fmt.Sprintf("<%s>; rel=\"next\" <%s>; rel=\"prev\" <%s>; rel=\"first\" <%s>; rel=\"last\"", prev.RequestURI, next.RequestURI, first.RequestURI, last.RequestURI)
+	links := fmt.Sprintf("<%s>; rel=\"next\" <%s>; rel=\"prev\" <%s>; rel=\"first\" <%s>; rel=\"last\"", prevURL, nextURL, firstURL, lastURL)
 	c.Header("Link", links)
 
 	c.JSON(http.StatusOK, gin.H{
 		"tareWeights": tareWeights,
+		"hmm":         lurl.Scheme,
 	})
 }
 
