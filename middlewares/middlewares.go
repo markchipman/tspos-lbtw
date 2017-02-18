@@ -3,9 +3,11 @@
 package middlewares
 
 import (
-	"github.com/wormling/tspos-lbtw/db"
-	"gopkg.in/gin-gonic/gin.v1"
 	"net/http"
+
+	"gopkg.in/gin-gonic/gin.v1"
+
+	"github.com/wormling/tspos-lbtw/db"
 )
 
 // Connect middleware clones the database session for each request and
@@ -27,15 +29,4 @@ func ErrorHandler(c *gin.Context) {
 			"errors": c.Errors,
 		})
 	}
-}
-
-// CORS Allow CORS
-func CORS(c *gin.Context) {
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-	if c.Request.Method == "OPTIONS" {
-		c.AbortWithStatus(200)
-		return
-	}
-	c.Next()
 }

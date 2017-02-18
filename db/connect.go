@@ -2,8 +2,10 @@ package db
 
 import (
 	"fmt"
-	"github.com/wormling/tspos-lbtw/config"
+
 	"gopkg.in/mgo.v2"
+
+	"github.com/wormling/tspos-lbtw/config"
 )
 
 var (

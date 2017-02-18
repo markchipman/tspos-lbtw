@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"gopkg.in/gin-contrib/cors.v1"
 	"gopkg.in/gin-gonic/gin.v1"
 	"gopkg.in/mgo.v2"
 
@@ -26,7 +27,7 @@ func main() {
 
 	router.Use(middlewares.Connect)
 	router.Use(middlewares.ErrorHandler)
-	router.Use(middlewares.CORS)
+	router.Use(cors.Default())
 
 	router.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/v1/tare/weights")
