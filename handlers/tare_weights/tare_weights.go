@@ -139,12 +139,12 @@ func MakeLinkHeader(c *gin.Context, page int, per_page int, count int) string {
 	// Build last link
 	s += MakeLink(c, count/per_page, per_page, "last")
 
-	if page <= 1 {
+	if page >= 1 {
 		// Build prev link
 		s += MakeLink(c, page-1, per_page, "prev")
 	}
 
-	if page >= count {
+	if page <= count {
 		// Build next link
 		s += MakeLink(c, page+1, per_page, "next")
 	}
