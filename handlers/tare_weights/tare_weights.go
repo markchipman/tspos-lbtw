@@ -77,40 +77,8 @@ func List(c *gin.Context) {
 	var count int = 0
 	count, err = db.C(models.CollectionTareWeights).Find(query).Count()
 
-	// Build first link
-	firstQuery := c.Request.URL.Query()
-	firstQuery.Set("page", "0")
-	firstQuery.Set("per_page", string(per_page))
-	first := c.Request
-	first.URL.RawQuery = firstQuery.Encode()
-	firstURL := lurl.Scheme + "://" + lurl.Host + first.RequestURI
-
-	// Build last link
-	lastQuery := c.Request.URL.Query()
-	lastQuery.Set("page", string(count/per_page))
-	lastQuery.Set("per_page", string(per_page))
-	last := c.Request
-	last.URL.RawQuery = lastQuery.Encode()
-	lastURL := lurl.Scheme + "://" + lurl.Host + last.RequestURI
-
-	// Build prev link
-	prevQuery := c.Request.URL.Query()
-	prevQuery.Set("page", string(page))
-	prevQuery.Set("per_page", string(per_page))
-	prev := c.Request
-	prev.URL.RawQuery = prevQuery.Encode()
-	prevURL := lurl.Scheme + "://" + lurl.Host + prev.RequestURI
-
-	// Build next link
-	nextQuery := c.Request.URL.Query()
-	nextQuery.Set("page", string(page))
-	nextQuery.Set("per_page", string(per_page))
-	next := c.Request
-	next.URL.RawQuery = nextQuery.Encode()
-	nextURL := lurl.Scheme + "://" + lurl.Host + next.RequestURI
-
 	// rfc5988
-	links := fmt.Sprintf("<%s>; rel=\"next\" <%s>; rel=\"prev\" <%s>; rel=\"first\" <%s>; rel=\"last\"", prevURL, nextURL, firstURL, lastURL)
+	links := MakeLinkHeader(c, page, per_page, count)
 	c.Header("Link", links)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -149,4 +117,37 @@ func Delete(c *gin.Context) {
 	if err != nil {
 		c.Error(err)
 	}
+}
+
+func MakeLink(c *gin.Context, page int, per_page int, rel_name string) string {
+	url := location.Get(c)
+	query := c.Request.URL.Query()
+	query.Set("page", string(page))
+	query.Set("per_page", string(per_page))
+	link := c.Request
+	link.URL.RawQuery = query.Encode()
+
+	return fmt.Sprintf("<%s>; rel=\"%s\" ", url.Scheme+"://"+url.Host+link.RequestURI, rel_name)
+}
+
+func MakeLinkHeader(c *gin.Context, page int, per_page int, count int) string {
+	s := ""
+
+	// Build first link
+	s += MakeLink(c, 0, per_page, "first")
+
+	// Build last link
+	s += MakeLink(c, count/per_page, per_page, "last")
+
+	if page <= 1 {
+		// Build prev link
+		s += MakeLink(c, page-1, per_page, "prev")
+	}
+
+	if page >= count {
+		// Build next link
+		s += MakeLink(c, page+1, per_page, "next")
+	}
+
+	return s
 }
