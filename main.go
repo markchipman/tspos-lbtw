@@ -61,9 +61,10 @@ func ensureIndex() {
 	c := session.DB("tspos_lbtw").C("tare_weights")
 
 	index := mgo.Index{
-		Key:        []string{"brand", "category", "name", "bottle_size"},
-		Unique:     true,
-		DropDups:   true,
+		//Key:        []string{"brand", "category", "name", "bottle_size, empty_weight, full_weight, image_url, created_on, updated_on"},
+		Key:        []string{"brand"},
+		Unique:     false,
+		DropDups:   false,
 		Background: true,
 		Sparse:     true,
 		Collation: &mgo.Collation{

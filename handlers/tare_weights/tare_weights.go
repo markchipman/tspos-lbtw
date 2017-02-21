@@ -44,12 +44,12 @@ func Get(c *gin.Context) {
 }
 
 func List(c *gin.Context) {
-	lurl := location.Get(c)
 	db := c.MustGet("db").(*mgo.Database)
 	tareWeights := []models.TareWeight{}
 	//query := models.TareWeight{}
 
 	var query map[string]string
+	var z []string
 	var ss []string
 	var page int = 0
 	var per_page int = 10
@@ -57,16 +57,18 @@ func List(c *gin.Context) {
 	ss = strings.Split(c.Request.URL.RawQuery, "&")
 	query = make(map[string]string)
 	for _, pair := range ss {
-		z := strings.Split(pair, "=")
-		switch z[0] {
-		case "page":
-			page, _ = strconv.Atoi(z[1])
-		case "per_page":
-			per_page, _ = strconv.Atoi(z[1])
-		default:
-			query[z[0]], _ = url.QueryUnescape(z[1])
-		}
+		z = strings.Split(pair, "=")
+		if len(z) > 1 {
+			switch z[0] {
+			case "page":
+				page, _ = strconv.Atoi(z[1])
+			case "per_page":
+				per_page, _ = strconv.Atoi(z[1])
+			default:
+				query[z[0]], _ = url.QueryUnescape(z[1])
+			}
 
+		}
 	}
 
 	err := db.C(models.CollectionTareWeights).Find(query).Skip(page * per_page).Limit(per_page).Sort("-updated_on").All(&tareWeights)
@@ -84,7 +86,6 @@ func List(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"tareWeights": tareWeights,
-		"hmm":         lurl.Scheme,
 	})
 }
 
