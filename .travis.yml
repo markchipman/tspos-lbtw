@@ -1,8 +1,16 @@
 language: go
 services: mongodb
 go:
-  - 1.6
-  - 1.7
+- 1.6
+- 1.7
+install:
+- go get golang.org/x/tools/cmd/cover
+- go get -v github.com/mattn/goveralls
 script:
-  - go test -v $(go list ./... | grep -v /vendor/)
-  - go build
+- go test -v $(go list ./... | grep -v /vendor/) -covermode=count -coverprofile=coverage.out
+- "$HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken
+  $COVERALLS_TOKEN"
+- go build
+env:
+  global:
+    secure: WRFzdEhInEMHUIKKt9gNwuqbFZOlzV2FTc18fsHd8ojIQ+mdJkZgoh69Yvtf8ZrtKxX42KJitfwfbQHOqAE7Lo1+Zt7IQwal2OlUjL9gc8BF4SjPx8V09B4ndBVqZ9P5WJ+37wom8oO0/OdTkQy4nFG5OX1+3q3Cq6nvdh8jumZF74P2PMDwcHD9lc3qPZn5NRKeUTBOqWa22rHChMQunz9OAVweRXej0w/uxtkC5jifkj06DsmN0gHbvx36geEVSAdCAAZxTtY67O2XebdoFq1cYA/H9v+eLdD4NCbqxkaY/JWz5YwtxcThqUf90P/BWvp2oNGXJu9jNFqr08Ag5UG+omxmxRnlzvUO/NUgE2QAWe51jRukUa64+6LlnO7KuZnnzwTj7K5TEhPwdfiyqpW7DByqW51+M/ySma4JNRgbB2nsr1HCj5GVHw8564vbErjmpmL6YFErxqiBl1SREz7VMeF9rzJrXM8eA7x8b0SCLSu9X+b+Ds165IlKRKnIBwO30wPYKYRnjjv1ykH+3rnofxGhG/efszr/wzK5wKfiCLwEhGP6v+TpUZ8WsY6Wj5/M1Qomg8FVyivRT5PBnfTXhrdkzQ0tPHoX+5dXRTKpxdX2iSZFeXnO/ad5QPS9jbEd30disEZbljN9OIdT1SkbB2ij7Y+fKjHgg42eZ7w=
