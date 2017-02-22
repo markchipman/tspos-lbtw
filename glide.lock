@@ -1,5 +1,5 @@
-hash: 06a89ff5c897bcd48bde46154daa370f7f023ea80e535f861e77978447957bc2
-updated: 2017-02-21T18:27:08.883621914+02:00
+hash: 7c0e286d06d1250ec99df9ac3fb2d37a1764f3e739cc80328b25016cc62c400e
+updated: 2017-02-22T19:11:32.079917093+02:00
 imports:
 - name: github.com/gin-contrib/location
   version: 6f73a0ea4ae9cb10d5487d94f1425a492eb00464
@@ -39,4 +39,39 @@ imports:
   - internal/scram
 - name: gopkg.in/yaml.v2
   version: a3f3340b5840cee44f372bddb5880fcbc419b46a
-testImports: []
+testImports:
+- name: github.com/modocache/gory
+  version: be241e6a2a24fc0284979937a742e0d3d5c4170a
+- name: github.com/onsi/ginkgo
+  version: bb93381d543b0e5725244abe752214a110791d01
+  subpackages:
+  - config
+  - internal/codelocation
+  - internal/containernode
+  - internal/failer
+  - internal/leafnodes
+  - internal/remote
+  - internal/spec
+  - internal/specrunner
+  - internal/suite
+  - internal/testingtproxy
+  - internal/writer
+  - reporters
+  - reporters/stenographer
+  - reporters/stenographer/support/go-colorable
+  - reporters/stenographer/support/go-isatty
+  - types
+- name: github.com/onsi/gomega
+  version: c463cd2a8578290d4be7a25cba69de81cf35785e
+  subpackages:
+  - format
+  - internal/assertion
+  - internal/asyncassertion
+  - internal/oraclematcher
+  - internal/testingtsupport
+  - matchers
+  - matchers/support/goraph/bipartitegraph
+  - matchers/support/goraph/edge
+  - matchers/support/goraph/node
+  - matchers/support/goraph/util
+  - types

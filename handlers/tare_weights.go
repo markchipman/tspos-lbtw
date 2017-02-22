@@ -13,7 +13,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gin-contrib/location"
-	"github.com/wormling/tspos-lbtw/models"
+	"github.com/wormling/tspos-lbtw.v1/models"
 )
 
 func Create(c *gin.Context) {
@@ -84,9 +84,7 @@ func List(c *gin.Context) {
 	c.Header("Link", links)
 	c.Header("X-Total-Count", string(count))
 
-	c.JSON(http.StatusOK, gin.H{
-		"tareWeights": tareWeights,
-	})
+	c.JSON(http.StatusOK, tareWeights)
 }
 
 func Update(c *gin.Context) {

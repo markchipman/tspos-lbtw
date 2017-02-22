@@ -12,6 +12,14 @@ Dependencies:
 * [Gin Gonic](https://github.com/gin-gonic) 
 * [mgo](https://labix.org/mgo)
 
+Package Management:
+* [Glide](https://github.com/Masterminds/glide)
+
+Testing:
+* [Ginkgo](https://onsi.github.io/ginkgo/)
+* [Gomega](http://onsi.github.io/gomega/)
+
+
 To install, run:
 ```bash
 $ go get github.com/wormling/tspos-lbtw.v1

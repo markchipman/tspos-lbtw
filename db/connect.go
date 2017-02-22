@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"gopkg.in/mgo.v2"
-
-	"github.com/wormling/tspos-lbtw/config"
 )
 
 var (
@@ -16,11 +14,7 @@ var (
 )
 
 // Connect connects to mongodb
-func Connect() {
-	config.BuildDefaultConf()
-	c, _ := config.LoadConfYaml("./config.yaml")
-	uri := c.Core.Database.Url
-
+func Connect(uri string) {
 	mongo, err := mgo.ParseURL(uri)
 	s, err := mgo.Dial(uri)
 	if err != nil {
@@ -33,4 +27,28 @@ func Connect() {
 	fmt.Println("Connected to", uri)
 	Session = s
 	Mongo = mongo
+}
+
+func EnsureIndex() {
+	session := Session.Clone()
+	defer session.Close()
+
+	c := session.DB("tspos_lbtw").C("tare_weights")
+
+	index := mgo.Index{
+		//Key:        []string{"brand", "category", "name", "bottle_size, empty_weight, full_weight, image_url, created_on, updated_on"},
+		Key:        []string{"brand"},
+		Unique:     false,
+		DropDups:   false,
+		Background: true,
+		Sparse:     true,
+		Collation: &mgo.Collation{
+			Locale:   "en",
+			Strength: 2,
+		},
+	}
+	err := c.EnsureIndex(index)
+	if err != nil {
+		panic(err)
+	}
 }
