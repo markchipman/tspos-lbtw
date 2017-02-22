@@ -19,12 +19,6 @@ Testing:
 * [Ginkgo](https://onsi.github.io/ginkgo/)
 * [Gomega](http://onsi.github.io/gomega/)
 
-
-To install, run:
-```bash
-$ go get github.com/wormling/tspos-lbtw.v1
-```
-
 To configure edit config.yaml:
 ```yaml
 core:
