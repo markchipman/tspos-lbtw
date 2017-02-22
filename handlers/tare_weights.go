@@ -13,7 +13,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gin-contrib/location"
-	"github.com/wormling/tspos-lbtw.v1/models"
+	"github.com/wormling/tspos-lbtw/models"
 )
 
 func Create(c *gin.Context) {

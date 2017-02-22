@@ -7,7 +7,7 @@ import (
 
 	"gopkg.in/gin-gonic/gin.v1"
 
-	"github.com/wormling/tspos-lbtw.v1/db"
+	"github.com/wormling/tspos-lbtw/db"
 )
 
 // Connect middleware clones the database session for each request and

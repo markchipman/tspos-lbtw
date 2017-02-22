@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/wormling/tspos-lbtw.v1/config"
-	"github.com/wormling/tspos-lbtw.v1/db"
-	"github.com/wormling/tspos-lbtw.v1/routes"
+	"github.com/wormling/tspos-lbtw/config"
+	"github.com/wormling/tspos-lbtw/db"
+	"github.com/wormling/tspos-lbtw/routes"
 )
 
 var conf config.ConfYaml

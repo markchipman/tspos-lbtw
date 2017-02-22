@@ -1,4 +1,4 @@
-package: github.com/wormling/tspos-lbtw.v1
+package: github.com/wormling/tspos-lbtw
 import:
 - package: github.com/gin-contrib/location
 - package: gopkg.in/gin-contrib/cors.v1

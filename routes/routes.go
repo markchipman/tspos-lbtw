@@ -7,8 +7,8 @@ import (
 	"gopkg.in/gin-gonic/gin.v1"
 
 	"github.com/gin-contrib/location"
-	"github.com/wormling/tspos-lbtw.v1/handlers"
-	"github.com/wormling/tspos-lbtw.v1/middlewares"
+	"github.com/wormling/tspos-lbtw/handlers"
+	"github.com/wormling/tspos-lbtw/middlewares"
 )
 
 func NewRouter() *gin.Engine {
