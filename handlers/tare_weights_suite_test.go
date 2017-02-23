@@ -31,4 +31,17 @@ func defineFactories() {
 			factory["CreatedOn"] = 0
 			factory["UpdatedOn"] = 0
 		})
+
+	gory.Define("tare_weight2", models.TareWeight{},
+		func(factory gory.Factory) {
+			factory["Brand"] = "Bacardi"
+			factory["Category"] = "Liquor"
+			factory["Name"] = "Bombay Sapphire Gin"
+			factory["BottleSize"] = 958.21
+			factory["EmptyWeight"] = 524.74
+			factory["FullWeight"] = 1600.0
+			factory["ImageUrl"] = ""
+			factory["CreatedOn"] = 0
+			factory["UpdatedOn"] = 0
+		})
 }

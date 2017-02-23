@@ -39,8 +39,10 @@ func Get(c *gin.Context) {
 	err := db.C(models.CollectionTareWeights).FindId(oID).One(&tareWeight)
 	if err != nil {
 		c.Error(err)
+		c.JSON(http.StatusNotFound, err)
+	} else {
+		c.JSON(http.StatusOK, tareWeight)
 	}
-	c.JSON(http.StatusOK, tareWeight)
 }
 
 func List(c *gin.Context) {
