@@ -7,6 +7,7 @@ import (
 	"github.com/modocache/gory"
 	"github.com/wormling/tspos-lbtw/models"
 	"testing"
+	"time"
 )
 
 func TestTsposLbtw(t *testing.T) {
@@ -28,8 +29,8 @@ func defineFactories() {
 			factory["EmptyWeight"] = 688.89
 			factory["FullWeight"] = 1700.0
 			factory["ImageUrl"] = ""
-			factory["CreatedOn"] = int64(0)
-			factory["UpdatedOn"] = int64(0)
+			factory["CreatedOn"] = time.Time{}
+			factory["UpdatedOn"] = time.Time{}
 		})
 
 	gory.Define("tare_weight2", models.TareWeight{},
@@ -41,7 +42,7 @@ func defineFactories() {
 			factory["EmptyWeight"] = 524.74
 			factory["FullWeight"] = 1600.0
 			factory["ImageUrl"] = ""
-			factory["CreatedOn"] = int64(0)
-			factory["UpdatedOn"] = int64(0)
+			factory["CreatedOn"] = time.Time{}
+			factory["UpdatedOn"] = time.Time{}
 		})
 }

@@ -59,8 +59,8 @@ var _ = Describe("Handlers/TareWeights", func() {
 
 			tareWeight2 := gory.BuildWithParams("tare_weight2", gory.Factory{
 				"Id":        objectId,
-				"CreatedOn": time.Now().UnixNano() / int64(time.Millisecond),
-				"UpdatedOn": time.Now().UnixNano() / int64(time.Millisecond),
+				"CreatedOn": time.Now(),
+				"UpdatedOn": time.Now(),
 			}).(*models.TareWeight)
 			collection.Insert(tareWeight2)
 
@@ -99,8 +99,8 @@ var _ = Describe("Handlers/TareWeights", func() {
 			Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
 			Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
 			Expect(tareWeightJSON.ImageUrl).To(Equal(""))
-			Expect(tareWeightJSON.CreatedOn).To(Equal(int64(0)))
-			Expect(tareWeightJSON.UpdatedOn).NotTo(Equal(int64(0)))
+			Expect(tareWeightJSON.CreatedOn).To(BeTemporally("==", time.Time{}))
+			Expect(tareWeightJSON.UpdatedOn).To(BeTemporally(">", time.Time{}))
 		})
 	})
 
@@ -190,8 +190,8 @@ var _ = Describe("Handlers/TareWeights", func() {
 				Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
 				Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
 				Expect(tareWeightJSON.ImageUrl).To(Equal(""))
-				Expect(tareWeightJSON.CreatedOn).To(Equal(int64(0)))
-				Expect(tareWeightJSON.UpdatedOn).To(Equal(int64(0)))
+				Expect(tareWeightJSON.CreatedOn).To(BeTemporally("==", time.Time{}))
+				Expect(tareWeightJSON.UpdatedOn).To(BeTemporally("==", time.Time{}))
 			})
 		})
 	})
@@ -243,8 +243,121 @@ var _ = Describe("Handlers/TareWeights", func() {
 				Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
 				Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
 				Expect(tareWeightJSON.ImageUrl).To(Equal(""))
-				Expect(tareWeightJSON.CreatedOn).To(Equal(int64(0)))
-				Expect(tareWeightJSON.UpdatedOn).To(Equal(int64(0)))
+				Expect(tareWeightJSON.CreatedOn).To(BeTemporally("==", time.Time{}))
+				Expect(tareWeightJSON.UpdatedOn).To(BeTemporally("==", time.Time{}))
+			})
+		})
+
+		Describe("given 25 tare weights", func() {
+			BeforeEach(func() {
+				collection := session.DB(dbName).C("tare_weights")
+				for i := 0; i < 25; i++ {
+					if i%2 != 0 {
+						collection.Insert(gory.Build("tare_weight"))
+					} else {
+						collection.Insert(gory.Build("tare_weight2"))
+					}
+				}
+			})
+
+			Context("with no per_page or page query parameters", func() {
+				It("returns the first 10 tare weights", func() {
+					server.ServeHTTP(recorder, request)
+
+					var tareWeightsJSON []models.TareWeight
+					json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+					Expect(len(tareWeightsJSON)).To(Equal(10))
+				})
+			})
+
+			Context("with per_page=15", func() {
+				BeforeEach(func() {
+					request.URL.RawQuery = "per_page=15"
+				})
+
+				It("returns the first 15 tare weights", func() {
+					server.ServeHTTP(recorder, request)
+
+					var tareWeightsJSON []models.TareWeight
+					json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+					Expect(len(tareWeightsJSON)).To(Equal(15))
+				})
+
+				AfterEach(func() {
+					request.URL.RawQuery = ""
+				})
+			})
+
+			Context("with per_page=15&page=2", func() {
+				BeforeEach(func() {
+					request.URL.RawQuery = "per_page=15&page=2"
+				})
+
+				It("returns the second page with 10 tare weights", func() {
+					server.ServeHTTP(recorder, request)
+
+					var tareWeightsJSON []models.TareWeight
+					json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+					Expect(len(tareWeightsJSON)).To(Equal(10))
+				})
+
+				AfterEach(func() {
+					request.URL.RawQuery = ""
+				})
+			})
+
+			Context("with page=4 which is out of range", func() {
+				BeforeEach(func() {
+					request.URL.RawQuery = "page=4"
+				})
+
+				It("returns 0 tare weights", func() {
+					server.ServeHTTP(recorder, request)
+
+					var tareWeightsJSON []models.TareWeight
+					json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+					Expect(len(tareWeightsJSON)).To(Equal(0))
+				})
+
+				AfterEach(func() {
+					request.URL.RawQuery = ""
+				})
+			})
+
+			Context("with page=-1 which is out of range", func() {
+				BeforeEach(func() {
+					request.URL.RawQuery = "page=-1"
+				})
+
+				It("returns 0 tare weights", func() {
+					server.ServeHTTP(recorder, request)
+
+					var tareWeightsJSON []models.TareWeight
+					json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+					Expect(len(tareWeightsJSON)).To(Equal(0))
+				})
+
+				AfterEach(func() {
+					request.URL.RawQuery = ""
+				})
+			})
+
+			Context("with page=X~!$YZ&num_pages=X~!$YZ which is invalid", func() {
+				BeforeEach(func() {
+					request.URL.RawQuery = "page=X~!$YZ&num_pages=X~!$YZ"
+				})
+
+				It("returns 0 tare weights", func() {
+					server.ServeHTTP(recorder, request)
+
+					var tareWeightsJSON []models.TareWeight
+					json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+					Expect(len(tareWeightsJSON)).To(Equal(0))
+				})
+
+				AfterEach(func() {
+					request.URL.RawQuery = ""
+				})
 			})
 		})
 	})
@@ -279,8 +392,8 @@ var _ = Describe("Handlers/TareWeights", func() {
 				Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
 				Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
 				Expect(tareWeightJSON.ImageUrl).To(Equal(""))
-				Expect(tareWeightJSON.CreatedOn).To(Equal(int64(0)))
-				Expect(tareWeightJSON.UpdatedOn).To(Equal(int64(0)))
+				Expect(tareWeightJSON.CreatedOn).To(BeTemporally("==", time.Time{}))
+				Expect(tareWeightJSON.UpdatedOn).To(BeTemporally("==", time.Time{}))
 
 			})
 		})

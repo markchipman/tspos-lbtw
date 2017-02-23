@@ -25,8 +25,8 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	tareWeight.CreatedOn = time.Now().UnixNano() / int64(time.Millisecond)
-	tareWeight.UpdatedOn = time.Now().UnixNano() / int64(time.Millisecond)
+	tareWeight.CreatedOn = time.Now()
+	tareWeight.UpdatedOn = time.Now()
 
 	err = db.C(models.CollectionTareWeights).Insert(tareWeight)
 	if err != nil {
@@ -51,12 +51,11 @@ func Get(c *gin.Context) {
 func List(c *gin.Context) {
 	db := c.MustGet("db").(*mgo.Database)
 	tareWeights := []models.TareWeight{}
-	//query := models.TareWeight{}
 
 	var query map[string]string
 	var z []string
 	var ss []string
-	var page int = 0
+	var page int = 1
 	var per_page int = 10
 
 	ss = strings.Split(c.Request.URL.RawQuery, "&")
@@ -67,22 +66,28 @@ func List(c *gin.Context) {
 			switch z[0] {
 			case "page":
 				page, _ = strconv.Atoi(z[1])
+				if page < 1 {
+					c.JSON(http.StatusNotFound, "Page: "+string(page)+" not found")
+					return
+				}
 			case "per_page":
 				per_page, _ = strconv.Atoi(z[1])
 			default:
 				query[z[0]], _ = url.QueryUnescape(z[1])
 			}
-
 		}
 	}
 
-	err := db.C(models.CollectionTareWeights).Find(query).Skip(page * per_page).Limit(per_page).Sort("-updated_on").All(&tareWeights)
+	err := db.C(models.CollectionTareWeights).Find(query).Skip((page - 1) * per_page).Limit(per_page).Sort("-updated_on").All(&tareWeights)
 	if err != nil {
 		c.Error(err)
 	}
 
 	var count int = 0
 	count, err = db.C(models.CollectionTareWeights).Find(query).Count()
+	if err != nil {
+		c.Error(err)
+	}
 
 	// rfc5988
 	links := MakeLinkHeader(c, page, per_page, count)
@@ -104,7 +109,7 @@ func Update(c *gin.Context) {
 
 	query := bson.M{"_id": bson.ObjectIdHex(c.Param("_id"))}
 
-	tareWeight.UpdatedOn = time.Now().UnixNano() / int64(time.Millisecond)
+	tareWeight.UpdatedOn = time.Now()
 
 	err = db.C(models.CollectionTareWeights).Update(query, tareWeight)
 	if err != nil {
