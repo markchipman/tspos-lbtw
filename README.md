@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat)](https://opensource.org/licenses/Apache-2.0)
 [![Build Status](http://img.shields.io/travis/wormling/tspos-lbtw.svg?branch=master)](https://travis-ci.org/wormling/tspos-lbtw) 
 [![GO Report Card](https://goreportcard.com/badge/github.com/wormling/tspos-lbtw)](https://goreportcard.com/report/github.com/wormling/tspos-lbtw)
-[![Coverage Status](https://coveralls.io/repos/wormling/tspos-lbtw/badge.png?branch=v1)](https://coveralls.io/r/wormling/tspos-lbtw)
+[![Coverage Status](https://coveralls.io/repos/github/wormling/tspos-lbtw/badge.svg?branch=v1)](https://coveralls.io/github/wormling/tspos-lbtw?branch=v1)
 
 REST API for liquor inventory using tare weights.
 
