@@ -49,6 +49,51 @@ var _ = Describe("Handlers/TareWeights", func() {
 		session.Close()
 	})
 
+	Describe("DELETE /v1/tare/weights/:id", func() {
+		BeforeEach(func() {
+			body, _ := json.Marshal(gory.Build("tare_weight"))
+			request, _ = http.NewRequest("POST", "/v1/tare/weights", bytes.NewReader(body))
+			request.Header.Set("content-type", "application/json")
+			collection := session.DB(dbName).C("tare_weights")
+			collection.Insert(gory.Build("tare_weight"))
+		})
+
+		It("returns a status code of 200", func() {
+			fmt.Printf(recorder.Body.String())
+			server.ServeHTTP(recorder, request)
+			Expect(recorder.Code).To(Equal(200))
+		})
+
+		It("does not exist after deleting", func() {
+			fmt.Printf(recorder.Body.String())
+			server.ServeHTTP(recorder, request)
+			Expect(recorder.Code).To(Equal(200))
+
+			recorder = httptest.NewRecorder()
+			request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
+			server.ServeHTTP(recorder, request)
+			Expect(recorder.Code).To(Equal(200))
+
+			var tareWeightsJSON []models.TareWeight
+			json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+			Expect(len(tareWeightsJSON)).To(Equal(1))
+
+			tareWeightJSON := tareWeightsJSON[0]
+			recorder = httptest.NewRecorder()
+			request, _ := http.NewRequest("DELETE", "/v1/tare/weights/"+tareWeightJSON.Id.Hex(), nil)
+			server.ServeHTTP(recorder, request)
+			Expect(recorder.Code).To(Equal(200))
+
+			recorder = httptest.NewRecorder()
+			request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
+			server.ServeHTTP(recorder, request)
+			Expect(recorder.Code).To(Equal(200))
+
+			json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+			Expect(len(tareWeightsJSON)).To(Equal(0))
+		})
+	})
+
 	Describe("POST /v1/tare/weights", func() {
 		BeforeEach(func() {
 			body, _ := json.Marshal(gory.Build("tare_weight"))
@@ -70,7 +115,7 @@ var _ = Describe("Handlers/TareWeights", func() {
 				server.ServeHTTP(recorder, request)
 				Expect(recorder.Code).To(Equal(200))
 
-				recorder := httptest.NewRecorder()
+				recorder = httptest.NewRecorder()
 				request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
 				server.ServeHTTP(recorder, request)
 				Expect(recorder.Code).To(Equal(200))
@@ -92,6 +137,7 @@ var _ = Describe("Handlers/TareWeights", func() {
 			})
 		})
 	})
+
 	Describe("GET /v1/tare/weights", func() {
 		BeforeEach(func() {
 			request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)

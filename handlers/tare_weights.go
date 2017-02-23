@@ -17,7 +17,7 @@ import (
 )
 
 func Create(c *gin.Context) {
-	db := c.MustGet("db").(*mgo.Database)
+	//db := c.MustGet("db").(*mgo.Database)
 	tareWeight := models.TareWeight{}
 	err := c.BindJSON(&tareWeight)
 	if err != nil {
@@ -25,11 +25,13 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	err = db.C(models.CollectionTareWeights).Insert(tareWeight)
-	if err != nil {
-		c.Error(err)
-	}
 	c.JSON(http.StatusOK, tareWeight)
+	//err = db.C(models.CollectionTareWeights).Insert(tareWeight)
+	//if err != nil {
+	//	c.JSON(http.StatusOK, gin.H{"err": err.Error()})
+	//	c.Error(err)
+	//}
+	//c.JSON(http.StatusOK, tareWeight)
 }
 
 func Get(c *gin.Context) {
@@ -38,8 +40,7 @@ func Get(c *gin.Context) {
 	oID := bson.ObjectIdHex(c.Param("_id"))
 	err := db.C(models.CollectionTareWeights).FindId(oID).One(&tareWeight)
 	if err != nil {
-		c.Error(err)
-		c.JSON(http.StatusNotFound, err)
+		c.JSON(http.StatusNotFound, gin.H{})
 	} else {
 		c.JSON(http.StatusOK, tareWeight)
 	}
