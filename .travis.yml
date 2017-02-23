@@ -12,7 +12,6 @@ install:
 script:
 - ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
 - gover
-- goveralls -coverprofile=gover.coverprofile -service drone.io -repotoken $COVERALLS_TOKEN
 #- go test -v $(go list ./... | grep -v /vendor/) -covermode=count -coverprofile=coverage.out
 - goveralls -coverprofile=gover.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
 - go build
