@@ -14,7 +14,7 @@ script:
 - gover
 - goveralls -coverprofile=gover.coverprofile -service drone.io -repotoken $COVERALLS_TOKEN
 #- go test -v $(go list ./... | grep -v /vendor/) -covermode=count -coverprofile=coverage.out
-- goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+- goveralls -coverprofile=gover.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
 - go build
 env:
   global:
