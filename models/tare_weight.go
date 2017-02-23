@@ -17,6 +17,6 @@ type TareWeight struct {
 	EmptyWeight float64       `json:"empty_weight" form:"empty_weight" binding:"required" bson:"empty_weight"` // Tare weight in grams
 	FullWeight  float64       `json:"full_weight" form:"full_weight" binding:"required" bson:"full_weight"`    // Full weight in grams
 	ImageUrl    string        `json:"image_url" form:"image_url" bson:"image_url"`
-	CreatedOn   int           `json:"created_on" bson:"created_on"`
-	UpdatedOn   int           `json:"updated_on" bson:"updated_on"`
+	CreatedOn   int64         `json:"created_on" bson:"created_on"`
+	UpdatedOn   int64         `json:"updated_on" bson:"updated_on"`
 }

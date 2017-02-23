@@ -19,6 +19,8 @@ import (
 	"github.com/wormling/tspos-lbtw/db"
 	"github.com/wormling/tspos-lbtw/models"
 	"github.com/wormling/tspos-lbtw/routes"
+	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 var _ = Describe("Handlers/TareWeights", func() {
@@ -49,13 +51,74 @@ var _ = Describe("Handlers/TareWeights", func() {
 		session.Close()
 	})
 
+	Describe("PUT /v1/tare/weights/:id", func() {
+		BeforeEach(func() {
+			collection := session.DB(dbName).C("tare_weights")
+
+			objectId := bson.NewObjectId()
+
+			tareWeight2 := gory.BuildWithParams("tare_weight2", gory.Factory{
+				"Id":        objectId,
+				"CreatedOn": time.Now().UnixNano() / int64(time.Millisecond),
+				"UpdatedOn": time.Now().UnixNano() / int64(time.Millisecond),
+			}).(*models.TareWeight)
+			collection.Insert(tareWeight2)
+
+			tareWeight := gory.BuildWithParams("tare_weight", gory.Factory{
+				"Id": objectId,
+			}).(*models.TareWeight)
+
+			body, _ := json.Marshal(tareWeight)
+			request, _ = http.NewRequest("PUT", "/v1/tare/weights/"+tareWeight.Id.Hex(), bytes.NewReader(body))
+			request.Header.Set("content-type", "application/json")
+		})
+
+		It("returns a status code of 200", func() {
+			fmt.Printf(recorder.Body.String())
+			server.ServeHTTP(recorder, request)
+			Expect(recorder.Code).To(Equal(200))
+		})
+
+		It("updated the tare weight", func() {
+			fmt.Printf(recorder.Body.String())
+			server.ServeHTTP(recorder, request)
+			Expect(recorder.Code).To(Equal(200))
+
+			// @todo Get the specific record instead
+			recorder = httptest.NewRecorder()
+			request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
+			server.ServeHTTP(recorder, request)
+			Expect(recorder.Code).To(Equal(200))
+
+			var tareWeightsJSON []models.TareWeight
+			json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+			Expect(len(tareWeightsJSON)).To(Equal(1))
+
+			tareWeightJSON := tareWeightsJSON[0]
+			Expect(tareWeightJSON.Brand).To(Equal("Bombay Sapphire"))
+			Expect(tareWeightJSON.Category).To(Equal("Liquor"))
+			Expect(tareWeightJSON.Name).To(Equal("Bombay Sapphire Gin"))
+			Expect(tareWeightJSON.BottleSize).To(Equal(958.22))
+			Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
+			Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
+			Expect(tareWeightJSON.ImageUrl).To(Equal(""))
+			Expect(tareWeightJSON.CreatedOn).To(Equal(int64(0)))
+			Expect(tareWeightJSON.UpdatedOn).NotTo(Equal(int64(0)))
+		})
+	})
+
 	Describe("DELETE /v1/tare/weights/:id", func() {
+		var objectId = bson.NewObjectId()
+
 		BeforeEach(func() {
 			body, _ := json.Marshal(gory.Build("tare_weight"))
 			request, _ = http.NewRequest("POST", "/v1/tare/weights", bytes.NewReader(body))
 			request.Header.Set("content-type", "application/json")
 			collection := session.DB(dbName).C("tare_weights")
-			collection.Insert(gory.Build("tare_weight"))
+			tareWeight := gory.BuildWithParams("tare_weight", gory.Factory{
+				"Id": objectId,
+			}).(*models.TareWeight)
+			collection.Insert(tareWeight)
 		})
 
 		It("returns a status code of 200", func() {
@@ -70,37 +133,37 @@ var _ = Describe("Handlers/TareWeights", func() {
 			Expect(recorder.Code).To(Equal(200))
 
 			recorder = httptest.NewRecorder()
-			request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
+			request, _ = http.NewRequest("GET", "/v1/tare/weights/"+objectId.Hex(), nil)
 			server.ServeHTTP(recorder, request)
 			Expect(recorder.Code).To(Equal(200))
 
-			var tareWeightsJSON []models.TareWeight
-			json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
-			Expect(len(tareWeightsJSON)).To(Equal(1))
+			var tareWeightJSON models.TareWeight
+			json.Unmarshal(recorder.Body.Bytes(), &tareWeightJSON)
 
-			tareWeightJSON := tareWeightsJSON[0]
 			recorder = httptest.NewRecorder()
 			request, _ := http.NewRequest("DELETE", "/v1/tare/weights/"+tareWeightJSON.Id.Hex(), nil)
 			server.ServeHTTP(recorder, request)
 			Expect(recorder.Code).To(Equal(200))
 
 			recorder = httptest.NewRecorder()
-			request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
+			request, _ = http.NewRequest("GET", "/v1/tare/weights/"+tareWeightJSON.Id.Hex(), nil)
 			server.ServeHTTP(recorder, request)
-			Expect(recorder.Code).To(Equal(200))
-
-			json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
-			Expect(len(tareWeightsJSON)).To(Equal(0))
+			Expect(recorder.Code).To(Equal(404))
 		})
 	})
 
 	Describe("POST /v1/tare/weights", func() {
+		var objectId = bson.NewObjectId()
+
 		BeforeEach(func() {
 			body, _ := json.Marshal(gory.Build("tare_weight"))
 			request, _ = http.NewRequest("POST", "/v1/tare/weights", bytes.NewReader(body))
 			request.Header.Set("content-type", "application/json")
 			collection := session.DB(dbName).C("tare_weights")
-			collection.Insert(gory.Build("tare_weight"))
+			tareWeight := gory.BuildWithParams("tare_weight", gory.Factory{
+				"Id": objectId,
+			}).(*models.TareWeight)
+			collection.Insert(tareWeight)
 		})
 
 		Context("when tare weight is created", func() {
@@ -116,24 +179,22 @@ var _ = Describe("Handlers/TareWeights", func() {
 				Expect(recorder.Code).To(Equal(200))
 
 				recorder = httptest.NewRecorder()
-				request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
+				request, _ = http.NewRequest("GET", "/v1/tare/weights/"+objectId.Hex(), nil)
 				server.ServeHTTP(recorder, request)
 				Expect(recorder.Code).To(Equal(200))
 
-				var tareWeightsJSON []models.TareWeight
-				json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
-				Expect(len(tareWeightsJSON)).To(Equal(1))
+				var tareWeightJSON models.TareWeight
+				json.Unmarshal(recorder.Body.Bytes(), &tareWeightJSON)
 
-				tareWeightJSON := tareWeightsJSON[0]
 				Expect(tareWeightJSON.Brand).To(Equal("Bombay Sapphire"))
 				Expect(tareWeightJSON.Category).To(Equal("Liquor"))
 				Expect(tareWeightJSON.Name).To(Equal("Bombay Sapphire Gin"))
-				Expect(tareWeightJSON.BottleSize).To(Equal(958.21))
+				Expect(tareWeightJSON.BottleSize).To(Equal(958.22))
 				Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
 				Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
 				Expect(tareWeightJSON.ImageUrl).To(Equal(""))
-				Expect(tareWeightJSON.CreatedOn).To(Equal(0))
-				Expect(tareWeightJSON.UpdatedOn).To(Equal(0))
+				Expect(tareWeightJSON.CreatedOn).To(Equal(int64(0)))
+				Expect(tareWeightJSON.UpdatedOn).To(Equal(int64(0)))
 			})
 		})
 	})
@@ -181,12 +242,12 @@ var _ = Describe("Handlers/TareWeights", func() {
 				Expect(tareWeightJSON.Brand).To(Equal("Bombay Sapphire"))
 				Expect(tareWeightJSON.Category).To(Equal("Liquor"))
 				Expect(tareWeightJSON.Name).To(Equal("Bombay Sapphire Gin"))
-				Expect(tareWeightJSON.BottleSize).To(Equal(958.21))
+				Expect(tareWeightJSON.BottleSize).To(Equal(958.22))
 				Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
 				Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
 				Expect(tareWeightJSON.ImageUrl).To(Equal(""))
-				Expect(tareWeightJSON.CreatedOn).To(Equal(0))
-				Expect(tareWeightJSON.UpdatedOn).To(Equal(0))
+				Expect(tareWeightJSON.CreatedOn).To(Equal(int64(0)))
+				Expect(tareWeightJSON.UpdatedOn).To(Equal(int64(0)))
 			})
 		})
 	})
@@ -217,12 +278,12 @@ var _ = Describe("Handlers/TareWeights", func() {
 				Expect(tareWeightJSON.Brand).To(Equal("Bombay Sapphire"))
 				Expect(tareWeightJSON.Category).To(Equal("Liquor"))
 				Expect(tareWeightJSON.Name).To(Equal("Bombay Sapphire Gin"))
-				Expect(tareWeightJSON.BottleSize).To(Equal(958.21))
+				Expect(tareWeightJSON.BottleSize).To(Equal(958.22))
 				Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
 				Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
 				Expect(tareWeightJSON.ImageUrl).To(Equal(""))
-				Expect(tareWeightJSON.CreatedOn).To(Equal(0))
-				Expect(tareWeightJSON.UpdatedOn).To(Equal(0))
+				Expect(tareWeightJSON.CreatedOn).To(Equal(int64(0)))
+				Expect(tareWeightJSON.UpdatedOn).To(Equal(int64(0)))
 
 			})
 		})

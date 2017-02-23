@@ -24,12 +24,12 @@ func defineFactories() {
 			factory["Brand"] = "Bombay Sapphire"
 			factory["Category"] = "Liquor"
 			factory["Name"] = "Bombay Sapphire Gin"
-			factory["BottleSize"] = 958.21
+			factory["BottleSize"] = 958.22
 			factory["EmptyWeight"] = 688.89
 			factory["FullWeight"] = 1700.0
 			factory["ImageUrl"] = ""
-			factory["CreatedOn"] = 0
-			factory["UpdatedOn"] = 0
+			factory["CreatedOn"] = int64(0)
+			factory["UpdatedOn"] = int64(0)
 		})
 
 	gory.Define("tare_weight2", models.TareWeight{},
@@ -41,7 +41,7 @@ func defineFactories() {
 			factory["EmptyWeight"] = 524.74
 			factory["FullWeight"] = 1600.0
 			factory["ImageUrl"] = ""
-			factory["CreatedOn"] = 0
-			factory["UpdatedOn"] = 0
+			factory["CreatedOn"] = int64(0)
+			factory["UpdatedOn"] = int64(0)
 		})
 }
