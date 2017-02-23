@@ -52,10 +52,10 @@ var _ = Describe("Handlers/TareWeights", func() {
 	})
 
 	Describe("PUT /v1/tare/weights/:id", func() {
+		var objectId = bson.NewObjectId()
+
 		BeforeEach(func() {
 			collection := session.DB(dbName).C("tare_weights")
-
-			objectId := bson.NewObjectId()
 
 			tareWeight2 := gory.BuildWithParams("tare_weight2", gory.Factory{
 				"Id":        objectId,
@@ -84,17 +84,14 @@ var _ = Describe("Handlers/TareWeights", func() {
 			server.ServeHTTP(recorder, request)
 			Expect(recorder.Code).To(Equal(200))
 
-			// @todo Get the specific record instead
 			recorder = httptest.NewRecorder()
-			request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
+			request, _ = http.NewRequest("GET", "/v1/tare/weights/"+objectId.Hex(), nil)
 			server.ServeHTTP(recorder, request)
 			Expect(recorder.Code).To(Equal(200))
 
-			var tareWeightsJSON []models.TareWeight
-			json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
-			Expect(len(tareWeightsJSON)).To(Equal(1))
+			var tareWeightJSON models.TareWeight
+			json.Unmarshal(recorder.Body.Bytes(), &tareWeightJSON)
 
-			tareWeightJSON := tareWeightsJSON[0]
 			Expect(tareWeightJSON.Brand).To(Equal("Bombay Sapphire"))
 			Expect(tareWeightJSON.Category).To(Equal("Liquor"))
 			Expect(tareWeightJSON.Name).To(Equal("Bombay Sapphire Gin"))
