@@ -15,29 +15,11 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"bytes"
 	"github.com/wormling/tspos-lbtw/db"
 	"github.com/wormling/tspos-lbtw/models"
 	"github.com/wormling/tspos-lbtw/routes"
 )
-
-/*
-Convert JSON data into a slice.
-*/
-func sliceFromJSON(data []byte) map[string]interface{} {
-	var result interface{}
-	json.Unmarshal(data, &result)
-	//return result.([]interface{})
-	return result.(map[string]interface{})
-}
-
-/*
-Convert JSON data into a map.
-*/
-func mapFromJSON(data []byte) map[string]interface{} {
-	var result interface{}
-	json.Unmarshal(data, &result)
-	return result.(map[string]interface{})
-}
 
 var _ = Describe("Handlers/TareWeights", func() {
 	var dbName string
@@ -67,9 +49,50 @@ var _ = Describe("Handlers/TareWeights", func() {
 		session.Close()
 	})
 
+	Describe("POST /v1/tare/weights", func() {
+		BeforeEach(func() {
+			body, _ := json.Marshal(gory.Build("tare_weight"))
+			request, _ = http.NewRequest("POST", "/v1/tare/weights", bytes.NewReader(body))
+			request.Header.Set("content-type", "application/json")
+			collection := session.DB(dbName).C("tare_weights")
+			collection.Insert(gory.Build("tare_weight"))
+		})
+
+		Context("when tare weight is created", func() {
+			It("returns a status code of 200", func() {
+				fmt.Printf(recorder.Body.String())
+				server.ServeHTTP(recorder, request)
+				Expect(recorder.Code).To(Equal(200))
+			})
+
+			It("returns the created tare weight", func() {
+				fmt.Printf(recorder.Body.String())
+				server.ServeHTTP(recorder, request)
+				Expect(recorder.Code).To(Equal(200))
+
+				recorder := httptest.NewRecorder()
+				request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
+				server.ServeHTTP(recorder, request)
+				Expect(recorder.Code).To(Equal(200))
+
+				var tareWeightsJSON []models.TareWeight
+				json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+				Expect(len(tareWeightsJSON)).To(Equal(1))
+
+				tareWeightJSON := tareWeightsJSON[0]
+				Expect(tareWeightJSON.Brand).To(Equal("Bombay Sapphire"))
+				Expect(tareWeightJSON.Category).To(Equal("Liquor"))
+				Expect(tareWeightJSON.Name).To(Equal("Bombay Sapphire Gin"))
+				Expect(tareWeightJSON.BottleSize).To(Equal(958.21))
+				Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
+				Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
+				Expect(tareWeightJSON.ImageUrl).To(Equal(""))
+				Expect(tareWeightJSON.CreatedOn).To(Equal(0))
+				Expect(tareWeightJSON.UpdatedOn).To(Equal(0))
+			})
+		})
+	})
 	Describe("GET /v1/tare/weights", func() {
-		// Set up a new GET request before every test
-		// in this describe block.
 		BeforeEach(func() {
 			request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
 		})
@@ -93,7 +116,7 @@ var _ = Describe("Handlers/TareWeights", func() {
 			BeforeEach(func() {
 				collection := session.DB(dbName).C("tare_weights")
 				collection.Insert(gory.Build("tare_weight"))
-				collection.Insert(gory.Build("tare_weight"))
+				collection.Insert(gory.Build("tare_weight2"))
 			})
 
 			It("returns a status code of 200", func() {
@@ -123,14 +146,11 @@ var _ = Describe("Handlers/TareWeights", func() {
 	})
 
 	Describe("GET /v1/tare/weights/:id", func() {
-		// Set up a new GET request before every test
-		// in this describe block.
 		BeforeEach(func() {
 			request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
 			collection := session.DB(dbName).C("tare_weights")
 			collection.Insert(gory.Build("tare_weight"))
 			collection.Insert(gory.Build("tare_weight2"))
-
 		})
 
 		Context("when the tare weight exists", func() {
@@ -163,8 +183,8 @@ var _ = Describe("Handlers/TareWeights", func() {
 
 		Context("when the tare weight does not exist", func() {
 			It("returns a empty body", func() {
-				requestOne, _ := http.NewRequest("GET", "/v1/tare/weights/507f1f77bcf86cd799439011", nil)
-				server.ServeHTTP(recorder, requestOne)
+				request, _ = http.NewRequest("GET", "/v1/tare/weights/507f1f77bcf86cd799439011", nil)
+				server.ServeHTTP(recorder, request)
 				Expect(recorder.Body.String()).To(Equal("{}\n"))
 			})
 		})
