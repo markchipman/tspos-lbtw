@@ -4,12 +4,17 @@ go:
 - 1.6
 - 1.7
 install:
+- go get github.com/onsi/ginkgo/ginkgo
+- go get github.com/onsi/gomega
 - go get golang.org/x/tools/cmd/cover
+- go get github.com/modocache/gover
 - go get -v github.com/mattn/goveralls
 script:
-- go test -v $(go list ./... | grep -v /vendor/) -covermode=count -coverprofile=coverage.out
-- "$HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken
-  $COVERALLS_TOKEN"
+- ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
+- gover
+- goveralls -coverprofile=gover.coverprofile -service drone.io -repotoken $COVERALLS_TOKEN
+#- go test -v $(go list ./... | grep -v /vendor/) -covermode=count -coverprofile=coverage.out
+- goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 - go build
 env:
   global:
