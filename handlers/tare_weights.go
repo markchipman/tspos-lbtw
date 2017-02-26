@@ -21,7 +21,7 @@ func Create(c *gin.Context) {
 	tareWeight := models.TareWeight{}
 	err := c.BindJSON(&tareWeight)
 	if err != nil {
-		c.Error(err)
+		c.JSON(http.StatusUnprocessableEntity, "Invalid parameter(s)")
 		return
 	}
 
@@ -31,7 +31,7 @@ func Create(c *gin.Context) {
 	err = db.C(models.CollectionTareWeights).Insert(tareWeight)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"err": err.Error()})
-		c.Error(err)
+		return
 	}
 	c.JSON(http.StatusOK, tareWeight)
 }
