@@ -3,7 +3,7 @@
 package middlewares
 
 import (
-	"net/http"
+	//"net/http"
 
 	"gopkg.in/gin-gonic/gin.v1"
 
@@ -22,11 +22,12 @@ func Connect(c *gin.Context) {
 }
 
 // ErrorHandler Error handler for gin
+// @todo Do we really want an error handler here?
 func ErrorHandler(c *gin.Context) {
-	c.Next()
-	if len(c.Errors) > 0 {
-		c.HTML(http.StatusBadRequest, "400", gin.H{
-			"errors": c.Errors,
-		})
-	}
+	//c.Next()
+	//if len(c.Errors) > 0 {
+	//	c.HTML(http.StatusBadRequest, "400", gin.H{
+	//		"errors": c.Errors,
+	//	})
+	//}
 }

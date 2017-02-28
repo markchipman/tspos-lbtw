@@ -309,25 +309,6 @@ var _ = Describe("Handlers/TareWeights", func() {
 				server.ServeHTTP(recorder, request)
 				Expect(recorder.Body.String()).To(Equal("[]\n"))
 			})
-
-			It("returns the tare weights in the body", func() {
-				server.ServeHTTP(recorder, request)
-
-				var tareWeightsJSON []models.TareWeight
-				json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
-				Expect(len(tareWeightsJSON)).To(Equal(2))
-
-				tareWeightJSON := tareWeightsJSON[0]
-				Expect(tareWeightJSON.Brand).To(Equal("Bombay Sapphire"))
-				Expect(tareWeightJSON.Category).To(Equal("Liquor"))
-				Expect(tareWeightJSON.Name).To(Equal("Bombay Sapphire Gin"))
-				Expect(tareWeightJSON.BottleSize).To(Equal(958.22))
-				Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
-				Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
-				Expect(tareWeightJSON.ImageUrl).To(Equal(""))
-				Expect(tareWeightJSON.CreatedOn).To(BeTemporally("==", time.Time{}))
-				Expect(tareWeightJSON.UpdatedOn).To(BeTemporally("==", time.Time{}))
-			})
 		})
 
 		Context("when tare weights exist", func() {
