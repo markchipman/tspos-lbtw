@@ -102,7 +102,7 @@ func List(c *gin.Context) {
 	}
 
 	// rfc5988
-	links := MakeLinkHeader(c, page, per_page, count)
+	links := makeLinkHeader(c, page, per_page, count)
 	c.Header("Link", links)
 	c.Header("X-Total-Count", string(count))
 
@@ -138,7 +138,7 @@ func Delete(c *gin.Context) {
 	}
 }
 
-func MakeLink(c *gin.Context, page int, perPage int, rel_name string) string {
+func makeLink(c *gin.Context, page int, perPage int, rel_name string) string {
 	lurl := location.Get(c)
 	query := c.Request.URL.Query()
 	query.Set("page", string(page))
@@ -149,23 +149,24 @@ func MakeLink(c *gin.Context, page int, perPage int, rel_name string) string {
 	return fmt.Sprintf("<%s>; rel=\"%s\" ", lurl.Scheme+"://"+lurl.Host+link.RequestURI, rel_name)
 }
 
-func MakeLinkHeader(c *gin.Context, page int, perPage int, count int) string {
+// Create the link header for pagination
+func makeLinkHeader(c *gin.Context, page int, perPage int, count int) string {
 	s := ""
 
 	// Build first link
-	s += MakeLink(c, 0, perPage, "first")
+	s += makeLink(c, 0, perPage, "first")
 
 	// Build last link
-	s += MakeLink(c, count/perPage, perPage, "last")
+	s += makeLink(c, count/perPage, perPage, "last")
 
 	if page >= 1 {
 		// Build prev link
-		s += MakeLink(c, page-1, perPage, "prev")
+		s += makeLink(c, page-1, perPage, "prev")
 	}
 
 	if page <= count {
 		// Build next link
-		s += MakeLink(c, page+1, perPage, "next")
+		s += makeLink(c, page+1, perPage, "next")
 	}
 
 	return s
