@@ -328,6 +328,21 @@ var _ = Describe("Handlers/TareWeights", func() {
 				})
 			})
 
+			Context("with invalid per_page=XYZ", func() {
+				BeforeEach(func() {
+					request.URL.RawQuery = "per_page=XYZ"
+				})
+
+				It("returns a status code of 422", func() {
+					server.ServeHTTP(recorder, request)
+					Expect(recorder.Code).To(Equal(422))
+				})
+
+				AfterEach(func() {
+					request.URL.RawQuery = ""
+				})
+			})
+
 			Context("with per_page=15&page=2", func() {
 				BeforeEach(func() {
 					request.URL.RawQuery = "per_page=15&page=2"

@@ -74,13 +74,15 @@ func List(c *gin.Context) {
 				var err error
 				per_page, err = strconv.Atoi(z[1])
 				if err != nil {
-					per_page = 10
+					c.JSON(http.StatusUnprocessableEntity, "Invalid parameter: "+pair)
+					return
 				}
 			default:
 				var err error
 				query[z[0]], err = url.QueryUnescape(z[1])
 				if err != nil {
 					c.JSON(http.StatusUnprocessableEntity, "Invalid parameter(s)")
+					return
 				}
 			}
 		}
