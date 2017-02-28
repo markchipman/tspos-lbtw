@@ -192,47 +192,64 @@ var _ = Describe("Handlers/TareWeights", func() {
 	})
 
 	Describe("DELETE /v1/tare/weights/:id", func() {
-		var objectId = bson.NewObjectId()
+		Describe("with valid input", func() {
+			var objectId = bson.NewObjectId()
 
-		BeforeEach(func() {
-			body, _ := json.Marshal(gory.Build("tare_weight"))
-			request, _ = http.NewRequest("POST", "/v1/tare/weights", bytes.NewReader(body))
-			request.Header.Set("content-type", "application/json")
-			collection := session.DB(dbName).C("tare_weights")
-			tareWeight := gory.BuildWithParams("tare_weight", gory.Factory{
-				"Id": objectId,
-			}).(*models.TareWeight)
-			collection.Insert(tareWeight)
+			BeforeEach(func() {
+				body, _ := json.Marshal(gory.Build("tare_weight"))
+				request, _ = http.NewRequest("POST", "/v1/tare/weights", bytes.NewReader(body))
+				request.Header.Set("content-type", "application/json")
+				collection := session.DB(dbName).C("tare_weights")
+				tareWeight := gory.BuildWithParams("tare_weight", gory.Factory{
+					"Id": objectId,
+				}).(*models.TareWeight)
+				collection.Insert(tareWeight)
+			})
+
+			It("returns a status code of 200", func() {
+				fmt.Printf(recorder.Body.String())
+				server.ServeHTTP(recorder, request)
+				Expect(recorder.Code).To(Equal(200))
+			})
+
+			It("does not exist after deleting", func() {
+				fmt.Printf(recorder.Body.String())
+				server.ServeHTTP(recorder, request)
+				Expect(recorder.Code).To(Equal(200))
+
+				recorder = httptest.NewRecorder()
+				request, _ = http.NewRequest("GET", "/v1/tare/weights/"+objectId.Hex(), nil)
+				server.ServeHTTP(recorder, request)
+				Expect(recorder.Code).To(Equal(200))
+
+				var tareWeightJSON models.TareWeight
+				json.Unmarshal(recorder.Body.Bytes(), &tareWeightJSON)
+
+				recorder = httptest.NewRecorder()
+				request, _ := http.NewRequest("DELETE", "/v1/tare/weights/"+tareWeightJSON.Id.Hex(), nil)
+				server.ServeHTTP(recorder, request)
+				Expect(recorder.Code).To(Equal(200))
+
+				recorder = httptest.NewRecorder()
+				request, _ = http.NewRequest("GET", "/v1/tare/weights/"+tareWeightJSON.Id.Hex(), nil)
+				server.ServeHTTP(recorder, request)
+				Expect(recorder.Code).To(Equal(404))
+			})
 		})
 
-		It("returns a status code of 200", func() {
-			fmt.Printf(recorder.Body.String())
-			server.ServeHTTP(recorder, request)
-			Expect(recorder.Code).To(Equal(200))
-		})
+		Describe("with invalid input", func() {
+			BeforeEach(func() {
+				json.Marshal(gory.Build("tare_weight"))
+				request, _ := http.NewRequest("DELETE", "/v1/tare/weights/"+bson.NewObjectId().Hex(), nil)
+				recorder = httptest.NewRecorder()
+				server.ServeHTTP(recorder, request)
+			})
 
-		It("does not exist after deleting", func() {
-			fmt.Printf(recorder.Body.String())
-			server.ServeHTTP(recorder, request)
-			Expect(recorder.Code).To(Equal(200))
-
-			recorder = httptest.NewRecorder()
-			request, _ = http.NewRequest("GET", "/v1/tare/weights/"+objectId.Hex(), nil)
-			server.ServeHTTP(recorder, request)
-			Expect(recorder.Code).To(Equal(200))
-
-			var tareWeightJSON models.TareWeight
-			json.Unmarshal(recorder.Body.Bytes(), &tareWeightJSON)
-
-			recorder = httptest.NewRecorder()
-			request, _ := http.NewRequest("DELETE", "/v1/tare/weights/"+tareWeightJSON.Id.Hex(), nil)
-			server.ServeHTTP(recorder, request)
-			Expect(recorder.Code).To(Equal(200))
-
-			recorder = httptest.NewRecorder()
-			request, _ = http.NewRequest("GET", "/v1/tare/weights/"+tareWeightJSON.Id.Hex(), nil)
-			server.ServeHTTP(recorder, request)
-			Expect(recorder.Code).To(Equal(404))
+			It("returns a status code of 404", func() {
+				fmt.Printf(recorder.Body.String())
+				server.ServeHTTP(recorder, request)
+				Expect(recorder.Code).To(Equal(404))
+			})
 		})
 	})
 
