@@ -255,6 +255,46 @@ var _ = Describe("Handlers/TareWeights", func() {
 
 	Describe("GET /v1/tare/weights", func() {
 		BeforeEach(func() {
+			request, _ = http.NewRequest("GET", "/v1/tare/weights?brand=Bombay%20Sapphire", nil)
+		})
+
+		Context("when tare weights exist", func() {
+			// Insert two valid tare weights into the database
+			// before each test in this context.
+			BeforeEach(func() {
+				collection := session.DB(dbName).C("tare_weights")
+				collection.Insert(gory.Build("tare_weight"))
+				collection.Insert(gory.Build("tare_weight2"))
+			})
+
+			It("returns a status code of 200", func() {
+				server.ServeHTTP(recorder, request)
+				Expect(recorder.Code).To(Equal(200))
+			})
+
+			It("returns the matching tare weight in the body", func() {
+				server.ServeHTTP(recorder, request)
+
+				var tareWeightsJSON []models.TareWeight
+				json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+				Expect(len(tareWeightsJSON)).To(Equal(1))
+
+				tareWeightJSON := tareWeightsJSON[0]
+				Expect(tareWeightJSON.Brand).To(Equal("Bombay Sapphire"))
+				Expect(tareWeightJSON.Category).To(Equal("Liquor"))
+				Expect(tareWeightJSON.Name).To(Equal("Bombay Sapphire Gin"))
+				Expect(tareWeightJSON.BottleSize).To(Equal(958.22))
+				Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
+				Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
+				Expect(tareWeightJSON.ImageUrl).To(Equal(""))
+				Expect(tareWeightJSON.CreatedOn).To(BeTemporally("==", time.Time{}))
+				Expect(tareWeightJSON.UpdatedOn).To(BeTemporally("==", time.Time{}))
+			})
+		})
+	})
+
+	Describe("GET /v1/tare/weights", func() {
+		BeforeEach(func() {
 			request, _ = http.NewRequest("GET", "/v1/tare/weights", nil)
 		})
 
@@ -269,10 +309,29 @@ var _ = Describe("Handlers/TareWeights", func() {
 				server.ServeHTTP(recorder, request)
 				Expect(recorder.Body.String()).To(Equal("[]\n"))
 			})
+
+			It("returns the tare weights in the body", func() {
+				server.ServeHTTP(recorder, request)
+
+				var tareWeightsJSON []models.TareWeight
+				json.Unmarshal(recorder.Body.Bytes(), &tareWeightsJSON)
+				Expect(len(tareWeightsJSON)).To(Equal(2))
+
+				tareWeightJSON := tareWeightsJSON[0]
+				Expect(tareWeightJSON.Brand).To(Equal("Bombay Sapphire"))
+				Expect(tareWeightJSON.Category).To(Equal("Liquor"))
+				Expect(tareWeightJSON.Name).To(Equal("Bombay Sapphire Gin"))
+				Expect(tareWeightJSON.BottleSize).To(Equal(958.22))
+				Expect(tareWeightJSON.EmptyWeight).To(Equal(688.89))
+				Expect(tareWeightJSON.FullWeight).To(Equal(1700.0))
+				Expect(tareWeightJSON.ImageUrl).To(Equal(""))
+				Expect(tareWeightJSON.CreatedOn).To(BeTemporally("==", time.Time{}))
+				Expect(tareWeightJSON.UpdatedOn).To(BeTemporally("==", time.Time{}))
+			})
 		})
 
 		Context("when tare weights exist", func() {
-			// Insert two valid signatures into the database
+			// Insert two valid tare weights into the database
 			// before each test in this context.
 			BeforeEach(func() {
 				collection := session.DB(dbName).C("tare_weights")
