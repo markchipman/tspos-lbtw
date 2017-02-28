@@ -30,7 +30,7 @@ func Create(c *gin.Context) {
 
 	err = db.C(models.CollectionTareWeights).Insert(tareWeight)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"err": err.Error()})
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, tareWeight)
@@ -71,22 +71,32 @@ func List(c *gin.Context) {
 					return
 				}
 			case "per_page":
-				per_page, _ = strconv.Atoi(z[1])
+				var err error
+				per_page, err = strconv.Atoi(z[1])
+				if err != nil {
+					per_page = 10
+				}
 			default:
-				query[z[0]], _ = url.QueryUnescape(z[1])
+				var err error
+				query[z[0]], err = url.QueryUnescape(z[1])
+				if err != nil {
+					c.JSON(http.StatusUnprocessableEntity, "Invalid parameter(s)")
+				}
 			}
 		}
 	}
 
 	err := db.C(models.CollectionTareWeights).Find(query).Skip((page - 1) * per_page).Limit(per_page).Sort("-updated_on").All(&tareWeights)
 	if err != nil {
-		c.Error(err)
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
 	}
 
 	var count int = 0
 	count, err = db.C(models.CollectionTareWeights).Find(query).Count()
 	if err != nil {
-		c.Error(err)
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return
 	}
 
 	// rfc5988
@@ -103,7 +113,7 @@ func Update(c *gin.Context) {
 	tareWeight := models.TareWeight{}
 	err := c.Bind(&tareWeight)
 	if err != nil {
-		c.Error(err)
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -113,7 +123,7 @@ func Update(c *gin.Context) {
 
 	err = db.C(models.CollectionTareWeights).Update(query, tareWeight)
 	if err != nil {
-		c.Error(err)
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 }
 
@@ -122,7 +132,7 @@ func Delete(c *gin.Context) {
 	query := bson.M{"_id": bson.ObjectIdHex(c.Param("_id"))}
 	err := db.C(models.CollectionTareWeights).Remove(query)
 	if err != nil {
-		c.Error(err)
+		c.JSON(http.StatusNotFound, err.Error())
 	}
 }
 

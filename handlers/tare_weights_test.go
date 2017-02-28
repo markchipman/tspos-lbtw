@@ -129,7 +129,7 @@ var _ = Describe("Handlers/TareWeights", func() {
 			})
 
 			Context("when invalid tare weight is created", func() {
-				It("returns a status code of 200", func() {
+				It("returns a status code of 400", func() {
 					fmt.Printf(recorder.Body.String())
 					server.ServeHTTP(recorder, request)
 					Expect(recorder.Code).To(Equal(400))
